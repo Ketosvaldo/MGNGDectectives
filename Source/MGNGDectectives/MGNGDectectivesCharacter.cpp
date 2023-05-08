@@ -8,7 +8,12 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
+#include "Granade.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/ArrowComponent.h"
+#include <chrono>
+#include <thread>
+#include "Kismet/GameplayStatics.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -47,6 +52,16 @@ AMGNGDectectivesCharacter::AMGNGDectectivesCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	DecalComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("ObjetivoGranada"));
+	DecalComponent->SetupAttachment(RootComponent);
+	DecalComponent->SetWorldRotation(FRotator(0.0f,90.0f,0.0f));
+	
+	ArrowDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowDirection"));
+	ArrowDirection->SetupAttachment(RootComponent);
+	
+	isRagdoll = false;
+	LanzadoGranada = false;
+	counter = 0;
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -64,6 +79,57 @@ void AMGNGDectectivesCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+}
+
+void AMGNGDectectivesCharacter::Tick(float DeltaSeconds)
+{
+	if(isRagdoll)
+	{
+		const FVector NewLocation(
+			GetMesh()->GetSocketLocation("pelvis").X,
+			GetMesh()->GetSocketLocation("pelvis").Y,
+			GetMesh()->GetSocketLocation("pelvis").Z + 90
+		);
+		GetCapsuleComponent()->SetWorldLocation(NewLocation);
+	}
+	/*DecalComponent->SetVisibility(LanzadoGranada);
+	
+	if(LanzadoGranada)
+	{
+		FHitResult HitResults;
+		TArray<FVector> OutPathPositions;
+		FVector OutLastTraceDestinations;
+
+		TArray<AActor*> ActorsToIgnore;
+		const FRotator MyRotator = GetControlRotation();
+		const FVector ForwardVector = MyRotator.Vector();
+		FVector StartLocation = /*Arrow->GetComponentLocation(); GetActorLocation();
+		FVector LaunchVelocity = ForwardVector * Impulso;
+
+		bool bTraceComplex = false;
+		TEnumAsByte<ECollisionChannel> CollisionChannel = ECC_WorldDynamic;
+		EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::ForOneFrame;
+		FCollisionQueryParams Params;
+		Params.bTraceComplex = bTraceComplex;
+		UGameplayStatics::Blueprint_PredictProjectilePath_ByTraceChannel(
+			GetWorld(),
+			HitResults,
+			OutPathPositions,
+			OutLastTraceDestinations,
+			StartLocation,
+			LaunchVelocity,
+			true,
+			20.0f,
+			CollisionChannel,
+			false,
+			ActorsToIgnore,
+			DrawDebugType,
+			0.0f,
+			15.0f,
+			2.0f,
+			0.0f
+		);
+	}*/
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -84,8 +150,74 @@ void AMGNGDectectivesCharacter::SetupPlayerInputComponent(class UInputComponent*
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMGNGDectectivesCharacter::Look);
 
+		//Die
+		EnhancedInputComponent->BindAction(DieAction, ETriggerEvent::Completed, this, &AMGNGDectectivesCharacter::Die);
+
+		//Throw
+		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Started, this, &AMGNGDectectivesCharacter::ThrowStart);
+		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Ongoing, this, &AMGNGDectectivesCharacter::ThrowOnGoing);
+		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Canceled, this, &AMGNGDectectivesCharacter::ThrowRelease);
 	}
 
+}
+
+void AMGNGDectectivesCharacter::ThrowStart()
+{
+	LanzadoGranada = true;
+}
+
+void AMGNGDectectivesCharacter::ThrowOnGoing()
+{
+	GEngine->AddOnScreenDebugMessage(
+			-1,
+			1.0f,
+			FColor::Red,
+			FString::Printf(TEXT("Contando"))
+	);
+	if (LanzadoGranada && counter >= 0.2f)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			1.0f,
+			FColor::Red,
+			FString::Printf(TEXT("Contando"))
+		);
+		Impulso = FMath::Clamp(Impulso, 100.0f, 2000.0f);
+		counter = 0;
+	}
+}
+
+void AMGNGDectectivesCharacter::ThrowRelease()
+{
+	LanzadoGranada = false;
+	/*GranadeBP = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BP_Granade.BP_Granade")));
+	UBlueprint* GeneratedBP = Cast<UBlueprint>(GranadeBP);
+	if(!GranadeBP)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
+		return;
+	}
+	UClass* SpawnClass = GranadeBP->StaticClass();
+	if (SpawnClass == NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+		return;
+	}
+	
+	UWorld* World = GetWorld();
+	*/
+	AGranade* Granade = GetWorld()->SpawnActor<AGranade>(AGranade::StaticClass(), ArrowDirection->GetComponentLocation(), GetControlRotation());
+	Granade->Impulso = Impulso;
+	Impulso = 0;
+}
+
+void AMGNGDectectivesCharacter::Die(const FInputActionValue& Value)
+{
+	if(Controller != nullptr)
+	{
+		isRagdoll = true;
+		GetMesh()->SetAllBodiesBelowSimulatePhysics("pelvis", true, true);
+	}
 }
 
 void AMGNGDectectivesCharacter::Move(const FInputActionValue& Value)
