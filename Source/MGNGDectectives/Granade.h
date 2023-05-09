@@ -6,6 +6,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PhysicsEngine/RadialForceComponent.h"
 #include "Granade.generated.h"
 
 UCLASS()
@@ -24,6 +25,9 @@ class MGNGDECTECTIVES_API AGranade : public AActor
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Particles, meta = (AllowPrivateAccess = "true"))
 	class UParticleSystem* ExplosionParticles;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Physics, meta = (AllowPrivateAccess = "true"))
+	class URadialForceComponent* RadialForce;
 	
 public:	
 	// Sets default values for this actor's properties
@@ -33,7 +37,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaSeconds) override;
+
 public:
 	UPROPERTY(EditAnywhere, Category="Weas")
 	float Impulso;
+	float counter;
+
+	TArray<AActor*> IgnoreActors;
 };

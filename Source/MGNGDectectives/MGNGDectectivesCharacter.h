@@ -34,8 +34,13 @@ class AMGNGDectectivesCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* DieAction;
 
+	//Throw Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ThrowAction;
+
+	//Throw Released
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ThrowReleased;
 	
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -66,9 +71,9 @@ protected:
 	
 	void ThrowStart();
 	
-	void ThrowOnGoing();
-	
 	void ThrowRelease();
+
+	void PrintOnDebug(FString TextToDisplay);
 
 protected:
 	// APawn interface
@@ -79,6 +84,7 @@ protected:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -90,6 +96,21 @@ public:
 	float Impulso;
 	float counter;
 
-	FString chingado;
+	FHitResult HitResults;
+	TArray<FVector> OutPathPositions;
+	FVector OutLastTraceDestinations;
+
+	TArray<AActor*> ActorsToIgnore;
+	FRotator MyRotator;
+	FVector ForwardVector;
+	
+	FVector StartLocation;
+	FVector LaunchVelocity;
+
+	bool bTraceComplex;
+	TEnumAsByte<ECollisionChannel> CollisionChannel;
+
+	FCollisionQueryParams Params;
+
 };
 

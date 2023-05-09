@@ -8,11 +8,9 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
-#include "Granade.h"
 #include "EnhancedInputSubsystems.h"
 #include "Components/ArrowComponent.h"
-#include <chrono>
-#include <thread>
+#include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -61,7 +59,8 @@ AMGNGDectectivesCharacter::AMGNGDectectivesCharacter()
 	
 	isRagdoll = false;
 	LanzadoGranada = false;
-	counter = 0;
+
+	
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -92,24 +91,19 @@ void AMGNGDectectivesCharacter::Tick(float DeltaSeconds)
 		);
 		GetCapsuleComponent()->SetWorldLocation(NewLocation);
 	}
-	/*DecalComponent->SetVisibility(LanzadoGranada);
+	
+	DecalComponent->SetVisibility(LanzadoGranada);
 	
 	if(LanzadoGranada)
 	{
-		FHitResult HitResults;
-		TArray<FVector> OutPathPositions;
-		FVector OutLastTraceDestinations;
-
-		TArray<AActor*> ActorsToIgnore;
-		const FRotator MyRotator = GetControlRotation();
-		const FVector ForwardVector = MyRotator.Vector();
-		FVector StartLocation = /*Arrow->GetComponentLocation(); GetActorLocation();
-		FVector LaunchVelocity = ForwardVector * Impulso;
-
-		bool bTraceComplex = false;
-		TEnumAsByte<ECollisionChannel> CollisionChannel = ECC_WorldDynamic;
-		EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::ForOneFrame;
-		FCollisionQueryParams Params;
+		counter += DeltaSeconds;
+		MyRotator = GetControlRotation();
+		ForwardVector = MyRotator.Vector();
+		StartLocation = ArrowDirection->GetComponentLocation();
+		LaunchVelocity = ForwardVector * 2000.0f;
+		bTraceComplex = false;
+		CollisionChannel = ECC_WorldDynamic;
+		EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::None;
 		Params.bTraceComplex = bTraceComplex;
 		UGameplayStatics::Blueprint_PredictProjectilePath_ByTraceChannel(
 			GetWorld(),
@@ -121,7 +115,7 @@ void AMGNGDectectivesCharacter::Tick(float DeltaSeconds)
 			true,
 			20.0f,
 			CollisionChannel,
-			false,
+			Params.bTraceComplex,
 			ActorsToIgnore,
 			DrawDebugType,
 			0.0f,
@@ -129,7 +123,8 @@ void AMGNGDectectivesCharacter::Tick(float DeltaSeconds)
 			2.0f,
 			0.0f
 		);
-	}*/
+		DecalComponent->SetWorldLocationAndRotation(HitResults.ImpactPoint, FQuat::MakeFromEuler(HitResults.ImpactNormal));
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -155,8 +150,7 @@ void AMGNGDectectivesCharacter::SetupPlayerInputComponent(class UInputComponent*
 
 		//Throw
 		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Started, this, &AMGNGDectectivesCharacter::ThrowStart);
-		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Ongoing, this, &AMGNGDectectivesCharacter::ThrowOnGoing);
-		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Canceled, this, &AMGNGDectectivesCharacter::ThrowRelease);
+		EnhancedInputComponent->BindAction(ThrowReleased, ETriggerEvent::Triggered, this, &AMGNGDectectivesCharacter::ThrowRelease);
 	}
 
 }
@@ -166,49 +160,21 @@ void AMGNGDectectivesCharacter::ThrowStart()
 	LanzadoGranada = true;
 }
 
-void AMGNGDectectivesCharacter::ThrowOnGoing()
-{
-	GEngine->AddOnScreenDebugMessage(
-			-1,
-			1.0f,
-			FColor::Red,
-			FString::Printf(TEXT("Contando"))
-	);
-	if (LanzadoGranada && counter >= 0.2f)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			1.0f,
-			FColor::Red,
-			FString::Printf(TEXT("Contando"))
-		);
-		Impulso = FMath::Clamp(Impulso, 100.0f, 2000.0f);
-		counter = 0;
-	}
-}
-
 void AMGNGDectectivesCharacter::ThrowRelease()
 {
 	LanzadoGranada = false;
-	/*GranadeBP = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BP_Granade.BP_Granade")));
-	UBlueprint* GeneratedBP = Cast<UBlueprint>(GranadeBP);
-	if(!GranadeBP)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
-		return;
-	}
-	UClass* SpawnClass = GranadeBP->StaticClass();
-	if (SpawnClass == NULL)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
-		return;
-	}
-	
-	UWorld* World = GetWorld();
-	*/
-	AGranade* Granade = GetWorld()->SpawnActor<AGranade>(AGranade::StaticClass(), ArrowDirection->GetComponentLocation(), GetControlRotation());
-	Granade->Impulso = Impulso;
-	Impulso = 0;
+	// Set the spawn parameters for the new actor
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	// Set the initial location and rotation for the new actor
+	FVector SpawnLocation = GetActorLocation() + FVector(100.f, 0.f, 0.f);
+	FRotator SpawnRotation = GetActorRotation();
+	// Spawn the new actor
+	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BP_Granade.BP_Granade")));
+	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+	GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, ArrowDirection->GetComponentLocation(), GetControlRotation(), SpawnParams);
 }
 
 void AMGNGDectectivesCharacter::Die(const FInputActionValue& Value)
@@ -256,6 +222,22 @@ void AMGNGDectectivesCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void AMGNGDectectivesCharacter::PrintOnDebug(FString TextToDisplay)
+{
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		1.0f,
+		FColor::Red,
+		TextToDisplay
+	);
+}
 
-
-
+float AMGNGDectectivesCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	if(DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
+	{
+		GetMesh()->SetAllBodiesBelowSimulatePhysics("pelvis", true);
+		isRagdoll = true;
+	}
+	return 0;
+}

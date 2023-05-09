@@ -2,8 +2,6 @@
 
 
 #include "Granade.h"
-#include <chrono>
-#include <thread>
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -24,16 +22,35 @@ AGranade::AGranade()
 
 	FString SoundPath = TEXT("/Game/StarterContent/Audio/Explosion01.Explosion01");
 	ExplosionSound = LoadObject<USoundBase>(nullptr, *SoundPath);
+
+	RadialForce = CreateDefaultSubobject<URadialForceComponent>(TEXT("RadialForce"));
+	RadialForce->SetupAttachment(RootComponent);
+	RadialForce->SetWorldLocation(GranadeMesh->GetComponentLocation());
+	RadialForce->Radius = 500.0f;
+	RadialForce->ImpulseStrength = 200000.0f;
+
+	counter = 0;
 }
 
 // Called when the game starts or when spawned
 void AGranade::BeginPlay()
 {
 	Super::BeginPlay();
-	constexpr  std::chrono::duration<float> Duration(3.0f);
-	std::this_thread::sleep_for(Duration);
-	UGameplayStatics::SpawnSound2D(GetWorld(), ExplosionSound, 1.0f,1.0f,0.0f,nullptr,false,true);
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticles, GetActorLocation());
-	Destroy();
 }
+
+void AGranade::Tick(float DeltaSeconds)
+{
+	RadialForce->SetWorldLocation(GranadeMesh->GetComponentLocation());
+	counter += DeltaSeconds;
+	if(counter >= 3.0f)
+	{
+		UWorld* World = GetWorld();
+		UGameplayStatics::ApplyRadialDamage(World, RadialForce->ImpulseStrength, GetActorLocation(), RadialForce->Radius, nullptr, IgnoreActors);
+		RadialForce->FireImpulse();
+		UGameplayStatics::SpawnSound2D(World, ExplosionSound, 1.0f,1.0f,0.0f,nullptr,false,true);
+		UGameplayStatics::SpawnEmitterAtLocation(World, ExplosionParticles, GetActorLocation());
+		Destroy();
+	}
+}
+
 
