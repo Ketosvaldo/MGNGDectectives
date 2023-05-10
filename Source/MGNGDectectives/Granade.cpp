@@ -2,12 +2,15 @@
 
 
 #include "Granade.h"
+
+#include "MGNGDectectivesCharacter.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AGranade::AGranade()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
 	GranadeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GranadeMesh"));
@@ -29,6 +32,9 @@ AGranade::AGranade()
 	RadialForce->Radius = 500.0f;
 	RadialForce->ImpulseStrength = 200000.0f;
 
+	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
+	SphereCollision->SetupAttachment(GranadeMesh);
+	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OverlapBegin);
 	counter = 0;
 }
 
@@ -41,8 +47,24 @@ void AGranade::BeginPlay()
 void AGranade::Tick(float DeltaSeconds)
 {
 	RadialForce->SetWorldLocation(GranadeMesh->GetComponentLocation());
-	counter += DeltaSeconds;
+	SphereCollision->SetWorldLocation(GranadeMesh->GetComponentLocation());
+	/*counter += DeltaSeconds;
 	if(counter >= 3.0f)
+	{
+		UWorld* World = GetWorld();
+		UGameplayStatics::ApplyRadialDamage(World, RadialForce->ImpulseStrength, GetActorLocation(), RadialForce->Radius, nullptr, IgnoreActors);
+		RadialForce->FireImpulse();
+		UGameplayStatics::SpawnSound2D(World, ExplosionSound, 1.0f,1.0f,0.0f,nullptr,false,true);
+		UGameplayStatics::SpawnEmitterAtLocation(World, ExplosionParticles, GetActorLocation());
+		Destroy();
+	}*/
+}
+
+void AGranade::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+	AMGNGDectectivesCharacter* Character = Cast<AMGNGDectectivesCharacter>(OtherActor);
+	
+	if ((Character != nullptr))
 	{
 		UWorld* World = GetWorld();
 		UGameplayStatics::ApplyRadialDamage(World, RadialForce->ImpulseStrength, GetActorLocation(), RadialForce->Radius, nullptr, IgnoreActors);
