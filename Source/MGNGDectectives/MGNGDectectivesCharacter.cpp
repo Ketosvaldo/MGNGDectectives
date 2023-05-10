@@ -84,11 +84,10 @@ void AMGNGDectectivesCharacter::Tick(float DeltaSeconds)
 {
 	if(isRagdoll)
 	{
-		GetMesh()->SetAllBodiesBelowSimulatePhysics("pelvis", true);
 		const FVector NewLocation(
-			GetMesh()->GetSocketLocation("pelvis").X,
-			GetMesh()->GetSocketLocation("pelvis").Y,
-			GetMesh()->GetSocketLocation("pelvis").Z + 90
+			GetMesh()->GetSocketLocation("spy_bones").X,
+			GetMesh()->GetSocketLocation("spy_bones").Y,
+			GetMesh()->GetSocketLocation("spy_bones").Z + 90
 		);
 		GetCapsuleComponent()->SetWorldLocation(NewLocation);
 	}
@@ -237,7 +236,7 @@ float AMGNGDectectivesCharacter::TakeDamage(float DamageAmount, struct FDamageEv
 {
 	if(DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
 	{
-		GetMesh()->SetAllBodiesBelowSimulatePhysics("pelvis", true);
+		GetMesh()->SetAllBodiesBelowSimulatePhysics("spy_bones", true);
 		isRagdoll = true;
 	}
 	return 0;
