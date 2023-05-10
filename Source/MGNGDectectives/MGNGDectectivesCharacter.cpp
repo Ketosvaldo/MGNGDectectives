@@ -9,6 +9,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "ItemActor.h"
 #include "Components/ArrowComponent.h"
 #include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
@@ -151,6 +152,10 @@ void AMGNGDectectivesCharacter::SetupPlayerInputComponent(class UInputComponent*
 		//Throw
 		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Started, this, &AMGNGDectectivesCharacter::ThrowStart);
 		EnhancedInputComponent->BindAction(ThrowReleased, ETriggerEvent::Triggered, this, &AMGNGDectectivesCharacter::ThrowRelease);
+
+		//Pickup
+		EnhancedInputComponent->BindAction(PickAction, ETriggerEvent::Started, this, &AMGNGDectectivesCharacter::PickUp);
+		
 	}
 
 }
@@ -230,6 +235,20 @@ void AMGNGDectectivesCharacter::PrintOnDebug(FString TextToDisplay)
 		FColor::Red,
 		TextToDisplay
 	);
+}
+
+void AMGNGDectectivesCharacter::PickUp()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance != nullptr && canPick)
+	{
+		AnimInstance->Montage_Play(PickAnimation, 2.0f);
+		Piece++;
+		//canPick = false;
+		itemClass->Destroy();
+		itemClass = nullptr;
+		canPick=false;
+	}
 }
 
 float AMGNGDectectivesCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)

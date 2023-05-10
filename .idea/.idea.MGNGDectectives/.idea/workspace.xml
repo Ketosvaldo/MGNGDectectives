@@ -11,8 +11,12 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MGNGDectectives/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MGNGDectectives/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/BP_Granade.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/BP_Granade.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/ThirdPerson/Blueprints/BP_ThirdPersonCharacter.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ThirdPerson/Blueprints/BP_ThirdPersonCharacter.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/MGNGDectectives/Granade.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MGNGDectectives/Granade.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/MGNGDectectives/Granade.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MGNGDectectives/Granade.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/ThirdPerson/Input/IMC_Default.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ThirdPerson/Input/IMC_Default.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/WB_UI.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/WB_UI.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/__ExternalActors__/ThirdPerson/Maps/ThirdPersonMap/C/3J/71U5IU76WVCURNVGQMHMBY.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/__ExternalActors__/ThirdPerson/Maps/ThirdPersonMap/C/3J/71U5IU76WVCURNVGQMHMBY.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/__ExternalActors__/ThirdPerson/Maps/ThirdPersonMap/D/4R/WZBIXPDAUIMHZX3SEKLECJ.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/__ExternalActors__/ThirdPerson/Maps/ThirdPersonMap/D/4R/WZBIXPDAUIMHZX3SEKLECJ.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/MGNGDectectives/MGNGDectectivesCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MGNGDectectives/MGNGDectectivesCharacter.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/MGNGDectectives/MGNGDectectivesCharacter.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MGNGDectectives/MGNGDectectivesCharacter.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,24 +26,34 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectId" id="2PLMvoRaqRypVChwQW0bGOyCAwk" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "rider.external.source.directories": [
+      "C:\\Users\\carlo\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
+      "C:\\Users\\carlo\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
+      "C:\\Users\\carlo\\AppData\\Local\\Symbols\\src"
+    ]
   }
-}</component>
-  <component name="RunManager" selected="C++ Project.MGNGDectectives">
+}]]></component>
+  <component name="RunManager" selected="C++ Project.UE5">
     <configuration name="MGNGDectectives" type="CppProject" factoryName="C++ Project">
       <configuration_1>
         <option name="CONFIGURATION" value="DebugGame Editor" />
@@ -164,6 +178,7 @@
       <workItem from="1683232171850" duration="51000" />
       <workItem from="1683737932299" duration="654000" />
       <workItem from="1683742046581" duration="1891000" />
+      <workItem from="1683758105019" duration="2686000" />
     </task>
     <servers />
   </component>
