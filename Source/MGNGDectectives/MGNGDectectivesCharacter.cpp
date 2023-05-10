@@ -84,6 +84,7 @@ void AMGNGDectectivesCharacter::Tick(float DeltaSeconds)
 {
 	if(isRagdoll)
 	{
+		GetMesh()->SetAllBodiesBelowSimulatePhysics("pelvis", true);
 		const FVector NewLocation(
 			GetMesh()->GetSocketLocation("pelvis").X,
 			GetMesh()->GetSocketLocation("pelvis").Y,
