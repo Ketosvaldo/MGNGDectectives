@@ -3,6 +3,7 @@
 
 #include "Granade.h"
 
+#include "MGNGDectectivesCharacter.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -32,7 +33,7 @@ AGranade::AGranade()
 	RadialForce->ImpulseStrength = 200000.0f;
 
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
-	SphereCollision->SetupAttachment(RootComponent);
+	SphereCollision->SetupAttachment(GranadeMesh);
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OverlapBegin);
 	counter = 0;
 }
@@ -46,6 +47,7 @@ void AGranade::BeginPlay()
 void AGranade::Tick(float DeltaSeconds)
 {
 	RadialForce->SetWorldLocation(GranadeMesh->GetComponentLocation());
+	SphereCollision->SetWorldLocation(GranadeMesh->GetComponentLocation());
 	/*counter += DeltaSeconds;
 	if(counter >= 3.0f)
 	{
@@ -60,7 +62,9 @@ void AGranade::Tick(float DeltaSeconds)
 
 void AGranade::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
-	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr))
+	AMGNGDectectivesCharacter* Character = Cast<AMGNGDectectivesCharacter>(OtherActor);
+	
+	if ((Character != nullptr))
 	{
 		UWorld* World = GetWorld();
 		UGameplayStatics::ApplyRadialDamage(World, RadialForce->ImpulseStrength, GetActorLocation(), RadialForce->Radius, nullptr, IgnoreActors);
