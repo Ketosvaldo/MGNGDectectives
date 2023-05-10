@@ -9,6 +9,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/ArrowComponent.h"
+#include "Engine/DamageEvents.h"
+#include "Kismet/GameplayStatics.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -47,6 +50,17 @@ AMGNGDectectivesCharacter::AMGNGDectectivesCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	DecalComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("ObjetivoGranada"));
+	DecalComponent->SetupAttachment(RootComponent);
+	DecalComponent->SetWorldRotation(FRotator(0.0f,90.0f,0.0f));
+	
+	ArrowDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowDirection"));
+	ArrowDirection->SetupAttachment(RootComponent);
+	
+	isRagdoll = false;
+	LanzadoGranada = false;
+
+	
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -63,6 +77,53 @@ void AMGNGDectectivesCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
+	}
+}
+
+void AMGNGDectectivesCharacter::Tick(float DeltaSeconds)
+{
+	if(isRagdoll)
+	{
+		const FVector NewLocation(
+			GetMesh()->GetSocketLocation("pelvis").X,
+			GetMesh()->GetSocketLocation("pelvis").Y,
+			GetMesh()->GetSocketLocation("pelvis").Z + 90
+		);
+		GetCapsuleComponent()->SetWorldLocation(NewLocation);
+	}
+	
+	DecalComponent->SetVisibility(LanzadoGranada);
+	
+	if(LanzadoGranada)
+	{
+		counter += DeltaSeconds;
+		MyRotator = GetControlRotation();
+		ForwardVector = MyRotator.Vector();
+		StartLocation = ArrowDirection->GetComponentLocation();
+		LaunchVelocity = ForwardVector * 2000.0f;
+		bTraceComplex = false;
+		CollisionChannel = ECC_WorldDynamic;
+		EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::None;
+		Params.bTraceComplex = bTraceComplex;
+		UGameplayStatics::Blueprint_PredictProjectilePath_ByTraceChannel(
+			GetWorld(),
+			HitResults,
+			OutPathPositions,
+			OutLastTraceDestinations,
+			StartLocation,
+			LaunchVelocity,
+			true,
+			20.0f,
+			CollisionChannel,
+			Params.bTraceComplex,
+			ActorsToIgnore,
+			DrawDebugType,
+			0.0f,
+			15.0f,
+			2.0f,
+			0.0f
+		);
+		DecalComponent->SetWorldLocationAndRotation(HitResults.ImpactPoint, FQuat::MakeFromEuler(HitResults.ImpactNormal));
 	}
 }
 
@@ -84,8 +145,45 @@ void AMGNGDectectivesCharacter::SetupPlayerInputComponent(class UInputComponent*
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMGNGDectectivesCharacter::Look);
 
+		//Die
+		EnhancedInputComponent->BindAction(DieAction, ETriggerEvent::Completed, this, &AMGNGDectectivesCharacter::Die);
+
+		//Throw
+		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Started, this, &AMGNGDectectivesCharacter::ThrowStart);
+		EnhancedInputComponent->BindAction(ThrowReleased, ETriggerEvent::Triggered, this, &AMGNGDectectivesCharacter::ThrowRelease);
 	}
 
+}
+
+void AMGNGDectectivesCharacter::ThrowStart()
+{
+	LanzadoGranada = true;
+}
+
+void AMGNGDectectivesCharacter::ThrowRelease()
+{
+	LanzadoGranada = false;
+	// Set the spawn parameters for the new actor
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	// Set the initial location and rotation for the new actor
+	FVector SpawnLocation = GetActorLocation() + FVector(100.f, 0.f, 0.f);
+	FRotator SpawnRotation = GetActorRotation();
+	// Spawn the new actor
+	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BP_Granade.BP_Granade")));
+	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+	GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, ArrowDirection->GetComponentLocation(), GetControlRotation(), SpawnParams);
+}
+
+void AMGNGDectectivesCharacter::Die(const FInputActionValue& Value)
+{
+	if(Controller != nullptr)
+	{
+		isRagdoll = true;
+		GetMesh()->SetAllBodiesBelowSimulatePhysics("pelvis", true, true);
+	}
 }
 
 void AMGNGDectectivesCharacter::Move(const FInputActionValue& Value)
@@ -124,6 +222,22 @@ void AMGNGDectectivesCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void AMGNGDectectivesCharacter::PrintOnDebug(FString TextToDisplay)
+{
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		1.0f,
+		FColor::Red,
+		TextToDisplay
+	);
+}
 
-
-
+float AMGNGDectectivesCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	if(DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
+	{
+		GetMesh()->SetAllBodiesBelowSimulatePhysics("pelvis", true);
+		isRagdoll = true;
+	}
+	return 0;
+}
