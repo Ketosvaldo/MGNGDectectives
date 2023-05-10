@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "Components/DecalComponent.h"
+#include "ItemActor.h"
 #include "MGNGDectectivesCharacter.generated.h"
 
 
@@ -55,11 +56,39 @@ class AMGNGDectectivesCharacter : public ACharacter
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Default, meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* DecalComponent;
+
+	/** Look Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* PickAction;
+
+	
+      /*                             
+    
+    */
+    
+   
+    
+	
 public:
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	class UAnimMontage* PickAnimation;
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+    class UAnimMontage* ShootAnimation;
+	UPROPERTY(EditAnywhere,Category = Item)
+        AItemActor* itemClass;
 	AMGNGDectectivesCharacter();
 	
 
 protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Weapon)
+	int Piece = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Weapon)
+	bool canSoot = true;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Weapon)
+	float granadeOpacity = 1.0;
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -74,6 +103,9 @@ protected:
 	void ThrowRelease();
 
 	void PrintOnDebug(FString TextToDisplay);
+
+	void PickUp();
+
 
 protected:
 	// APawn interface
@@ -95,7 +127,8 @@ public:
 	bool LanzadoGranada;
 	float Impulso;
 	float counter;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Weapon)
+    bool canPick = false;
 	FHitResult HitResults;
 	TArray<FVector> OutPathPositions;
 	FVector OutLastTraceDestinations;
