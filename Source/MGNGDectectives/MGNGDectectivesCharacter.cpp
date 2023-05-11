@@ -272,6 +272,7 @@ void AMGNGDectectivesCharacter::Tick(float DeltaSeconds)
 			GetMesh()->GetSocketLocation("spy_bones").Z + 90
 		);
 		GetCapsuleComponent()->SetWorldLocation(NewLocation);
+		tieso = true;
 	}
 	
 	DecalComponent->SetVisibility(LanzadoGranada);
@@ -310,8 +311,9 @@ void AMGNGDectectivesCharacter::Tick(float DeltaSeconds)
 	if(StartCount)
 	{
 		counter += DeltaSeconds;
-		if(counter >= 0.5f)
+		if(counter >= 0.5f && canSoot)
 		{
+			canSoot = false;
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
 			SpawnParams.Instigator = GetInstigator();
@@ -323,8 +325,14 @@ void AMGNGDectectivesCharacter::Tick(float DeltaSeconds)
 			UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BP_Granade.BP_Granade")));
 			UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
 			GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, ArrowDirection->GetComponentLocation(), GetControlRotation(), SpawnParams);
+		
+		}
+		else if(counter >= 2.0f)
+		{
+			granadeOpacity = 1.0;
 			StartCount = false;
 			counter = 0;
+			canSoot = true;
 		}
 	}
 }
@@ -359,17 +367,18 @@ void AMGNGDectectivesCharacter::SetupPlayerInputComponent(class UInputComponent*
 
 void AMGNGDectectivesCharacter::ThrowStart()
 {
-	if(!isRagdoll)
+	if(!isRagdoll && canSoot)
 		LanzadoGranada = true;
 }
 
 void AMGNGDectectivesCharacter::ThrowRelease()
 {
-	if(!isRagdoll)
+	if(!isRagdoll && canSoot)
 	{
 		LanzadoGranada = false;
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		StartCount = true;
+		granadeOpacity = 0.2;
 		if (AnimInstance != nullptr)
 		{
 			AnimInstance->Montage_Play(ShootAnimation, 2.0f);

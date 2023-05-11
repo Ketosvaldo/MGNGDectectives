@@ -84,14 +84,17 @@ UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 
 protected:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Weapon)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Keys)
 	int Piece = 0;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Weapon)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Weapon)
 	bool canSoot = true;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Weapon)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Weapon)
 	float granadeOpacity = 1.0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Death)
+	bool tieso = false;
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -137,7 +140,9 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+	
 	bool isRagdoll;
+	
 	bool LanzadoGranada;
 	float Impulso;
 	float counter;
