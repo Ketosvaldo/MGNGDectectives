@@ -141,6 +141,8 @@ public:
 	bool LanzadoGranada;
 	float Impulso;
 	float counter;
+
+	bool StartCount;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Weapon)
     bool canPick = false;
 	FHitResult HitResults;
