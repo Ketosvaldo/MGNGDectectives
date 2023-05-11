@@ -345,6 +345,31 @@ void AMGNGDectectivesCharacter::ThrowRelease()
 	if(!isRagdoll)
 	{
 		LanzadoGranada = false;
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(ShootAnimation, 2.0f);
+			// Set the spawn parameters for the new actor
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = GetInstigator();
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			// Set the initial location and rotation for the new actor
+			FVector SpawnLocation = GetActorLocation() + FVector(100.f, 0.f, 0.f);
+			FRotator SpawnRotation = GetActorRotation();
+			// Spawn the new actor
+			UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BP_Granade.BP_Granade")));
+			UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+			GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, ArrowDirection->GetComponentLocation(), GetControlRotation(), SpawnParams);
+		}
+	}
+}
+
+void AMGNGDectectivesCharacter::Die(const FInputActionValue& Value)
+{
+	if(Controller != nullptr)
+	{
+		LanzadoGranada = false;
 		// Set the spawn parameters for the new actor
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this;
