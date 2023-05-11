@@ -62,9 +62,9 @@ void AGranade::Tick(float DeltaSeconds)
 
 void AGranade::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
-	AMGNGDectectivesCharacter* Character = Cast<AMGNGDectectivesCharacter>(OtherActor);
-	
-	if ((Character != nullptr))
+	ACharacter* Character = Cast<ACharacter>(OtherActor);
+
+	if (Character != nullptr)
 	{
 		UWorld* World = GetWorld();
 		UGameplayStatics::ApplyRadialDamage(World, RadialForce->ImpulseStrength, GetActorLocation(), RadialForce->Radius, nullptr, IgnoreActors);
