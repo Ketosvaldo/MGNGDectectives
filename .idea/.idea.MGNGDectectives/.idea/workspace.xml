@@ -8,12 +8,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e6cc527-2ec4-4662-98f8-739a9229d5c8" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.MGNGDectectives/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MGNGDectectives/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vsconfig" beforeDir="false" afterPath="$PROJECT_DIR$/.vsconfig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MGNGDectectives.uproject" beforeDir="false" afterPath="$PROJECT_DIR$/MGNGDectectives.uproject" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/MGNGDectectives/MGNGDectectives.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MGNGDectectives/MGNGDectectives.Build.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/MGNGDectectives/MGNGDectectivesCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MGNGDectectives/MGNGDectectivesCharacter.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/MGNGDectectives/MGNGDectectivesCharacter.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MGNGDectectives/MGNGDectectivesCharacter.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -180,7 +175,7 @@
       <workItem from="1683772870100" duration="636000" />
       <workItem from="1683774946678" duration="3000" />
       <workItem from="1683783152696" duration="3504000" />
-      <workItem from="1683786804503" duration="1194000" />
+      <workItem from="1683786804503" duration="1663000" />
     </task>
     <servers />
   </component>

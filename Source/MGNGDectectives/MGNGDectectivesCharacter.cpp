@@ -336,21 +336,25 @@ void AMGNGDectectivesCharacter::SetupPlayerInputComponent(class UInputComponent*
 
 void AMGNGDectectivesCharacter::ThrowStart()
 {
-	LanzadoGranada = true;
+	if(!isRagdoll)
+		LanzadoGranada = true;
 }
 
 void AMGNGDectectivesCharacter::ThrowRelease()
 {
-	LanzadoGranada = false;
-	// Set the spawn parameters for the new actor
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = GetInstigator();
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	// Spawn the new actor
-	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BP_Granade.BP_Granade")));
-	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-	GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, ArrowDirection->GetComponentLocation(), GetControlRotation(), SpawnParams);
+	if(!isRagdoll)
+	{
+		LanzadoGranada = false;
+		// Set the spawn parameters for the new actor
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = GetInstigator();
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		// Spawn the new actor
+		UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BP_Granade.BP_Granade")));
+		UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+		GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, ArrowDirection->GetComponentLocation(), GetControlRotation(), SpawnParams);
+	}
 }
 
 void AMGNGDectectivesCharacter::Move(const FInputActionValue& Value)
