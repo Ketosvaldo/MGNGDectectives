@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "Components/DecalComponent.h"
 #include "ItemActor.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "MGNGDectectivesCharacter.generated.h"
 
 
@@ -77,6 +78,8 @@ UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	UPROPERTY(EditAnywhere,Category = Item)
         AItemActor* itemClass;
 	AMGNGDectectivesCharacter();
+
+	IOnlineSessionPtr OnlineSessionInterface;
 	
 
 protected:
@@ -117,6 +120,17 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION(BlueprintCallable)
+	void CreateGameSession();
+
+	UFUNCTION(BlueprintCallable)
+	void JoinGameSession();
+
+	//Callbacks
+	void OnCreateSessionComplete(FName SessionName, bool bWasSuccess);
+	void OnFindSessionComplete(bool bWasSuccessful);
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -144,6 +158,11 @@ public:
 	TEnumAsByte<ECollisionChannel> CollisionChannel;
 
 	FCollisionQueryParams Params;
+private:
+	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
+	FOnFindSessionsCompleteDelegate FindSessionsCompleteDelegate;
+	FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;
 
+	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 };
 
