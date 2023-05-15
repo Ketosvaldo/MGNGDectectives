@@ -1,6 +1,8 @@
 # Visual Studio 2015 user specific files
 .vs/
 
+.idea/
+
 # Compiled Object files
 *.slo
 *.lo
@@ -79,3 +81,5 @@ Plugins/*/RiderLink/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+.idea/.idea.MGNGDectectives/.idea/workspace.xml
