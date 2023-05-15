@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -78,7 +76,8 @@ UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	UPROPERTY(EditAnywhere,Category = Item)
         AItemActor* itemClass;
 	AMGNGDectectivesCharacter();
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TSubclassOf<AActor>Granada;
 	IOnlineSessionPtr OnlineSessionInterface;
 	
 

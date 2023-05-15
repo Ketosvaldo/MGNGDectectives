@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "MGNGDectectivesCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -171,7 +169,7 @@ void AMGNGDectectivesCharacter::OnCreateSessionComplete(FName SessionName, bool 
 		UWorld* World = GetWorld();
 		if(World)
 		{
-			World->ServerTravel(FString("/Game/ThirdPerson/Maps/Lobby?listen"));
+			World->ServerTravel(FString("/Game/ThirdPerson/Maps/BattleMap_Lobby?listen"));
 		}
 	}
 	else
@@ -322,9 +320,9 @@ void AMGNGDectectivesCharacter::Tick(float DeltaSeconds)
 			FVector SpawnLocation = GetActorLocation() + FVector(100.f, 0.f, 0.f);
 			FRotator SpawnRotation = GetActorRotation();
 			// Spawn the new actor
-			UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BP_Granade.BP_Granade")));
-			UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-			GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, ArrowDirection->GetComponentLocation(), GetControlRotation(), SpawnParams);
+			/*Object* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BP_Granade.BP_Granade")));
+			UBlueprint* GgeneratedBP = Cast<UBlueprint>(SpawnActor);*/
+			GetWorld()->SpawnActor<AActor>(Granada, ArrowDirection->GetComponentLocation(), GetControlRotation(), SpawnParams);
 		
 		}
 		else if(counter >= 2.0f)
@@ -409,9 +407,9 @@ void AMGNGDectectivesCharacter::Die(const FInputActionValue& Value)
 		SpawnParams.Instigator = GetInstigator();
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		// Spawn the new actor
-		UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BP_Granade.BP_Granade")));
-		UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-		GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, ArrowDirection->GetComponentLocation(), GetControlRotation(), SpawnParams);
+		//UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/BP_Granade.BP_Granade")));
+		//UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+		GetWorld()->SpawnActor<AActor>(Granada, ArrowDirection->GetComponentLocation(), GetControlRotation(), SpawnParams);
 	}
 }
 
